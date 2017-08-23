@@ -30,7 +30,6 @@ def status_code(index, status, interval):
 def keyword_count(index, keyword, interval):
     es = connect.connect()
 
-    # keyword query
     result = es.count(
         index="%s" % index,
         body={
