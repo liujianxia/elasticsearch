@@ -32,7 +32,7 @@ def keyword_search(url, index, keyword, interval):
 
 
 if __name__ == "__main__":
-    url = "http://116.62.148.72:9200/"
+    url = "http://localhost:9200/"
     index = "logstash-*"
     keyword = "*"
     interval = "1h"
