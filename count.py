@@ -4,17 +4,18 @@
 import connect
 
 
-def status_code(index,status, method, interval):
+def status_code(index, status, interval):
+    # establish connection to ES server
     es = connect.connect()
 
+    # Query DSL api . Match http status code check the past time
     result = es.count(
         index="%s-*" % index,
         body={
             "query": {
                 "bool": {
                     "must": [
-                        {"match": {"status": "%s" % status}},
-                        {"match": {"method": "%s" % method}}
+                        {"match": {"status": "%s" % status}}
                     ],
                     "filter": [
                         {"range": {"@timestamp": {"gte": "now-%s" % interval}}}
@@ -22,13 +23,14 @@ def status_code(index,status, method, interval):
                 }
             }
         })
+    # return the count of http status code
     return result['count']
 
 
 def keyword_count(index, keyword, interval):
     es = connect.connect()
 
-    c = es.search(
+    result = es.count(
         index="%s" % index,
         body={
             "query": {
@@ -50,7 +52,7 @@ def keyword_count(index, keyword, interval):
             }
         }
     )
-    return c['hits']
+    return result['count']
 
 
 def avg_resopnse_time(index,hostname,interval):
