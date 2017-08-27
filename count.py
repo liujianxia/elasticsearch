@@ -1,9 +1,7 @@
 #!/usr/bin/env python
-# encoding=utf-8
+# coding: utf-8
 
 import connect
-import json
-import sys
 
 
 def status_code(index, status, hostname, interval):
@@ -30,7 +28,7 @@ def status_code(index, status, hostname, interval):
     return result['count']
 
 
-def keyword_count(index, keyword, interval):
+def keyword_count(index, field, keyword, interval="1m"):
     es = connect.connect()
 
     result = es.count(
@@ -40,7 +38,7 @@ def keyword_count(index, keyword, interval):
                 "bool": {
                     "must": {
                         "match": {
-                            "message": "%s" % keyword
+                            "%s" % field: "%s" % keyword
                         }
                     },
                     "filter": {
@@ -58,7 +56,7 @@ def keyword_count(index, keyword, interval):
     return result['count']
 
 
-def avg_resopnse_time(index,hostname,interval):
+def avg_response_time(index, hostname, interval):
     es = connect.connect()
 
     avg = es.search(
@@ -95,7 +93,7 @@ def avg_resopnse_time(index,hostname,interval):
     return avg
 
 
-def get_response_time(index, hostname, interval):
+def get_response_time(index, hostname, interval="1m"):
     es = connect.connect()
 
     result = es.search(
@@ -131,27 +129,10 @@ def get_response_time(index, hostname, interval):
             if 'upstream_response_time' in result['hits']['hits'][i]['_source'].keys():
                 time_sum = time_sum + result['hits']['hits'][i]['_source']['upstream_response_time']
                 k = k+1
+
         return time_sum/k
 
 
-if __name__ == "__main__":
-    #count = status_code("logstash", 200, "POST", "30h")
-    #print count
-    #result = keyword_count("logstash-*","stuAppApi","4h")
-    #print result
-    #result2 = avg_resopnse_time("logstash-*", "iZbp1gfnfrgfa947vey7zhZ","5h")
-    #print result2
-    avg_time = get_response_time("logstash-*","iZbp1gfnfrgfa947vey7zhZ","800m")
-    print avg_time
-    if sys.argv[1] == "avg_resopnse_time":
-        avg_time = get_response_time("nginx-access*",sys.argv[2],"1m")
-        print avg_time
-    else:
-        if sys.argv[1] == "keyword_partten":
-            count_keyword = keyword_count(sys.argv[2], sys.argv[3], "1m")
-            print count_keyword
-        else:
-            if sys.argv[1] == "status":
-                status_count = status_code("nginx-access*", sys.argv[2],sys.argv[3], "1m")
-                print status_count
+
+
 
